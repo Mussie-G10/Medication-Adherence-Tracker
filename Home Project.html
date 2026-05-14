@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Tigray Care | Dark Mode Health Reminder</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, 'Segoe UI', 'Inter', 'Helvetica Neue', sans-serif;
+    }
+
+    /* DARK THEME GLOBAL */
+    body {
+      background: #0a0f12;
+      min-height: 100vh;
+      padding: 1.5rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: background 0.2s;
+    }
+
+    /* main app container */
+    .app-wrapper {
+      max-width: 1300px;
+      width: 100%;
+    }
+
+    /* Card base dark style */
+    .dark-card {
+      background: rgba(18, 25, 30, 0.95);
+      backdrop-filter: blur(2px);
+      border-radius: 2rem;
+      box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.6), 0 4px 12px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.2s ease;
+    }
+
+    /* Header - deep warm dark */
+    .header {
+      background: #1e2a2e;
+      background: linear-gradient(135deg, #2a3b3f 0%, #142226 100%);
+      padding: 1.5rem 2rem;
+      color: #f0e6d8;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      border-bottom: 1px solid #3e4e54;
+    }
+
+    .title-section h1 {
+      font-size: 1.9rem;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .title-section p {
+      font-size: 0.85rem;
+      opacity: 0.8;
+      margin-top: 0.3rem;
+    }
+
+    .date-badge, .user-greeting {
+      background: rgba(255,255,255,0.08);
+      padding: 0.5rem 1rem;
+      border-radius: 60px;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    /* content grid */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.8rem;
+      padding: 2rem;
+    }
+
+    /* card style */
+    .card {
+      background: #0f1a1f;
+      border-radius: 1.8rem;
+      padding: 1.5rem 1.6rem;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+      border: 1px solid #2a3a40;
+      transition: transform 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      border-color: #b87c4f40;
+    }
+
+    .card h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-left: 4px solid #d98c5f;
+      padding-left: 0.8rem;
+      color: #f2e0ce;
+    }
+
+    .reminder-list {
+      list-style: none;
+      margin-bottom: 1.5rem;
+      max-height: 260px;
+      overflow-y: auto;
+      padding-right: 6px;
+    }
+
+    .reminder-item {
+      background: #0e171c;
+      margin-bottom: 12px;
+      padding: 12px 14px;
+      border-radius: 1.2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid #2c4048;
+    }
+
+    .reminder-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .reminder-title {
+      font-weight: 600;
+      color: #eadbc8;
+      font-size: 1rem;
+    }
+
+    .reminder-time {
+      font-size: 0.75rem;
+      color: #9bb7c4;
+    }
+
+    .check-btn, .delete-btn {
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+      border-radius: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .check-btn {
+      color: #7fc29b;
+      background: #1e3a2f;
+    }
+    .delete-btn {
+      color: #e0a18b;
+      background: #2f2420;
+    }
+    .completed-reminder .reminder-title {
+      text-decoration: line-through;
+      color: #6c8b9a;
+    }
+
+    .add-form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .form-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    input, select {
+      flex: 1;
+      padding: 12px 14px;
+      border-radius: 2rem;
+      border: 1px solid #2a4b55;
+      background: #071217;
+      color: #f0e2d4;
+      font-size: 0.9rem;
+      outline: none;
+    }
+    input:focus, select:focus {
+      border-color: #d98c5f;
+      box-shadow: 0 0 0 2px #d98c5f40;
+    }
+
+    .btn-primary {
+      background: #b45f3a;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 2.5rem;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .btn-primary:hover {
+      background: #9b4c2c;
+      transform: scale(0.97);
+    }
+
+    .tip-card {
+      background: #142026;
+      border-left: 4px solid #e6a157;
+    }
+    .tip-text {
+      background: #0c161c;
+      padding: 1rem;
+      border-radius: 1.2rem;
+      color: #ecd9c6;
+    }
+    .next-check {
+      margin-top: 1rem;
+      color: #e2bc93;
+    }
+    .metrics {
+      display: flex;
+      gap: 12px;
+      margin-top: 1rem;
+    }
+    .metric {
+      background: #0b181f;
+      border-radius: 1.2rem;
+      padding: 10px;
+      text-align: center;
+      flex: 1;
+    }
+    .metric-number {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #de9f76;
+    }
+    footer {
+      background: #0a1419;
+      padding: 1rem;
+      text-align: center;
+      font-size: 0.75rem;
+      color: #9bb1b3;
+      border-top: 1px solid #253b42;
+    }
+
+    /* Onboarding page (first screen) - dark stylish */
+    .page {
+      transition: all 0.3s ease;
+    }
+    .hidden-page {
+      display: none;
+    }
+
+    .onboarding-container {
+      max-width: 550px;
+      margin: 0 auto;
+      background: #111e24;
+      border-radius: 2rem;
+      padding: 2rem;
+      box-shadow: 0 20px 35px rgba(0,0,0,0.5);
+      border: 1px solid #2c4a55;
+    }
+    .onboarding-container h2 {
+      color: #f0cfb3;
+    }
+    .input-group {
+      margin-bottom: 1.2rem;
+      text-align: left;
+    }
+    .input-group label {
+      display: block;
+      margin-bottom: 0.4rem;
+      font-weight: 500;
+      color: #cfb595;
+    }
+    .reminder-suggestions {
+      background: #0b1a21;
+      border-radius: 1.2rem;
+      padding: 0.8rem;
+      margin: 1rem 0;
+    }
+    .reminder-suggestions span {
+      display: inline-block;
+      background: #1f363f;
+      padding: 6px 12px;
+      border-radius: 50px;
+      margin: 4px;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+    .reminder-suggestions span:hover {
+      background: #b45f3a;
+      color: white;
+    }
+
+    /* confirmation page (after selection) */
+    .confirmation-page {
+      text-align: center;
+      max-width: 550px;
+      margin: 2rem auto;
+      background: #111e24;
+      border-radius: 2rem;
+      padding: 2rem;
+      border: 1px solid #c28352;
+    }
+    .confirmation-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid #d98c5f;
+      color: #d98c5f;
+      margin-top: 1rem;
+    }
+
+    @media (max-width: 720px) {
+      .content-grid { grid-template-columns: 1fr; padding: 1rem; }
+      .header { flex-direction: column; align-items: start; }
+    }
+    .empty-msg { color: #7a9aa8; text-align: center; padding: 1rem; }
+  </style>
+</head>
+<body>
+<div class="app-wrapper">
+  <!-- PAGE 1: ONBOARDING (ask person, age, reminder to add) -->
+  <div id="onboardingPage" class="page">
+    <div class="onboarding-container">
+      <h2 style="text-align:center;">🌾 Tigray Care</h2>
+      <p style="text-align:center; margin-bottom:1.5rem;">Personal health companion · Dark mode</p>
+      <div class="input-group">
+        <label>👤 Your name</label>
+        <input type="text" id="userNameInput" placeholder="e.g., Azeb, Tekle, Mhret" autocomplete="off">
+      </div>
+      <div class="input-group">
+        <label>🎂 Age (for health insights)</label>
+        <input type="number" id="userAgeInput" placeholder="e.g., 42" min="1" max="120">
+      </div>
+      <div class="input-group">
+        <label>💊 What would you like to be reminded about?</label>
+        <select id="reminderTypeSelect">
+          <option value="Medication">💊 Medication</option>
+          <option value="Checkup">🩺 Checkup</option>
+          <option value="Hydration">💧 Hydration / Water</option>
+          <option value="Exercise">🚶 Exercise / Walk</option>
+          <option value="Custom">✏️ Custom (type below)</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>📝 Reminder details</label>
+        <input type="text" id="reminderDetailInput" placeholder="e.g., Take insulin, Blood pressure, Yoga">
+      </div>
+      <div class="reminder-suggestions" id="suggestionBox">
+        <strong>✨ Quick suggestions:</strong><br>
+        <span data-suggest="Take morning vitamins">💊 Morning vitamins</span>
+        <span data-suggest="Blood pressure measurement">❤️ BP check</span>
+        <span data-suggest="Drink 2 liters water">💧 Hydration</span>
+        <span data-suggest="Evening walk 25min">🚶 Walk</span>
+      </div>
+      <button class="btn-primary" id="confirmSelectionBtn" style="width:100%;">✅ Set Reminder & Continue</button>
+    </div>
+  </div>
+
+  <!-- PAGE 2: CONFIRMATION (reminder set, then automatically go to dashboard) -->
+  <div id="confirmationPage" class="page hidden-page">
+    <div class="confirmation-page">
+      <div class="confirmation-icon">🎯✅</div>
+      <h2 style="color:#f0cfb3;">Your reminder is set!</h2>
+      <p id="confirmMessage" style="margin: 1rem 0; color:#cbc1b0;">Your health reminder has been saved.</p>
+      <div style="background:#0b1f26; border-radius: 1rem; padding: 0.8rem; margin: 1rem 0;">
+        <span id="reminderPreviewText" style="font-weight:bold; color:#e6bc93;">---</span>
+      </div>
+      <button class="btn-primary" id="goToDashboardBtn">📊 Go to my Dashboard</button>
+    </div>
+  </div>
+
+  <!-- PAGE 3: MAIN DASHBOARD (actual health tracker) -->
+  <div id="dashboardPage" class="page hidden-page">
+    <div class="dark-card">
+      <div class="header">
+        <div class="title-section">
+          <h1><span>🌾</span> Tigray Care</h1>
+          <p>ዓዲ ጥዕና · dark wellness · smart reminders</p>
+        </div>
+        <div style="display: flex; gap: 12px; align-items:center;">
+          <div class="user-greeting" id="dashboardUserGreeting">👤 Welcome</div>
+          <div class="date-badge" id="dashboardDate"></div>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="card">
+          <h2>📋 My Health Reminders</h2>
+          <ul class="reminder-list" id="reminderListArea">
+            <li class="empty-msg">✨ No reminders — add below</li>
+          </ul>
+          <div class="add-form">
+            <div class="form-row">
+              <input type="text" id="newReminderText" placeholder="e.g., Take medicine" autocomplete="off">
+              <input type="time" id="newReminderTime" value="09:00">
+            </div>
+            <div class="form-row">
+              <select id="newReminderType">
+                <option value="Medication">💊 Medication</option>
+                <option value="Checkup">🩺 Checkup</option>
+                <option value="Hydration">💧 Hydration</option>
+                <option value="Exercise">🚶 Exercise</option>
+              </select>
+              <button class="btn-primary" id="addReminderDashboardBtn">➕ Add Reminder</button>
+            </div>
+          </div>
+          <div class="metrics">
+            <div class="metric"><div class="metric-number" id="totalMetric">0</div><div class="metric-label">Total</div></div>
+            <div class="metric"><div class="metric-number" id="pendingMetric">0</div><div class="metric-label">Pending</div></div>
+            <div class="metric"><div class="metric-number" id="completedMetric">0</div><div class="metric-label">Completed</div></div>
+          </div>
+        </div>
+        <div class="card tip-card">
+          <h2>✨ Wellness Insight</h2>
+          <div class="tip-text" id="dynamicWellnessTip">"Consistency builds a healthier you."</div>
+          <div class="next-check" id="nextReminderMsg">⏰ No upcoming reminders</div>
+          <hr style="margin:1rem 0; border-color:#2d4955;">
+          <div style="color:#c2aa8a;">🫀 Quick actions</div>
+          <div style="margin-top: 10px; display: flex; gap: 8px; flex-wrap:wrap;">
+            <span style="background:#1d353e; border-radius:30px; padding:5px 12px;">❤️ BP Reminder</span>
+            <span style="background:#1d353e; border-radius:30px; padding:5px 12px;">🧘 Stretch</span>
+          </div>
+        </div>
+      </div>
+      <footer>🌿 Tigray Care — Your health journey, beautifully tracked.</footer>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ---------- DATA MODELS ----------
+  let reminders = [];        // each: {id, text, time, type, completed}
+  let userProfile = { name: "", age: null };
+
+  // Helper: save & load
+  function saveRemindersToLocal() {
+    localStorage.setItem('tigrayCareRemindersDark', JSON.stringify(reminders));
+  }
+  function saveProfileLocal() {
+    localStorage.setItem('tigrayCareProfileDark', JSON.stringify(userProfile));
+  }
+  function loadData() {
+    const storedRem = localStorage.getItem('tigrayCareRemindersDark');
+    if (storedRem) {
+      try {
+        reminders = JSON.parse(storedRem);
+        reminders = reminders.filter(r => r && typeof r.id === 'number').map(r => ({...r, completed: !!r.completed}));
+      } catch(e) { reminders = []; }
+    }
+    const storedProf = localStorage.getItem('tigrayCareProfileDark');
+    if (storedProf) {
+      try {
+        userProfile = JSON.parse(storedProf);
+      } catch(e) { userProfile = { name: "", age: null }; }
+    }
+  }
+
+  // UI Components for Dashboard
+  function updateDashboardStats() {
+    const total = reminders.length;
+    const completed = reminders.filter(r => r.completed).length;
+    const pending = total - completed;
+    document.getElementById('totalMetric').innerText = total;
+    document.getElementById('completedMetric').innerText = completed;
+    document.getElementById('pendingMetric').innerText = pending;
+  }
+
+  function renderDashboardReminders() {
+    const container = document.getElementById('reminderListArea');
+    if (!container) return;
+    if (reminders.length === 0) {
+      container.innerHTML = '<li class="empty-msg">➕ No reminders. Add your first one!</li>';
+      updateDashboardStats();
+      updateNextReminderHintDashboard();
+      return;
+    }
+    const sorted = [...reminders].sort((a,b) => {
+      if(a.completed !== b.completed) return a.completed ? 1 : -1;
+      return a.time.localeCompare(b.time);
+    });
+    container.innerHTML = '';
+    sorted.forEach(rem => {
+      const li = document.createElement('li');
+      li.className = `reminder-item ${rem.completed ? 'completed-reminder' : ''}`;
+      let iconType = '💊';
+      if (rem.type === 'Checkup') iconType = '🩺';
+      else if (rem.type === 'Hydration') iconType = '💧';
+      else if (rem.type === 'Exercise') iconType = '🚶';
+      li.innerHTML = `
+        <div class="reminder-info">
+          <div class="reminder-title">${escapeHtml(rem.text)}</div>
+          <div class="reminder-time">🕒 ${rem.time} · ${iconType} ${rem.type}</div>
+        </div>
+        <div class="reminder-actions">
+          <button class="check-btn" data-id="${rem.id}" data-action="toggle">✓</button>
+          <button class="delete-btn" data-id="${rem.id}" data-action="delete">🗑</button>
+        </div>
+      `;
+      container.appendChild(li);
+    });
+    attachReminderEvents();
+    updateDashboardStats();
+    updateNextReminderHintDashboard();
+    rotateWellnessTip();
+  }
+
+  function attachReminderEvents() {
+    document.querySelectorAll('.check-btn').forEach(btn => {
+      btn.removeEventListener('click', handleCheck);
+      btn.addEventListener('click', handleCheck);
+    });
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+      btn.removeEventListener('click', handleDelete);
+      btn.addEventListener('click', handleDelete);
+    });
+  }
+  function handleCheck(e) {
+    const id = parseInt(e.currentTarget.getAttribute('data-id'));
+    const reminder = reminders.find(r => r.id === id);
+    if (reminder) { reminder.completed = !reminder.completed; saveRemindersToLocal(); renderDashboardReminders(); }
+  }
+  function handleDelete(e) {
+    const id = parseInt(e.currentTarget.getAttribute('data-id'));
+    reminders = reminders.filter(r => r.id !== id);
+    saveRemindersToLocal();
+    renderDashboardReminders();
+  }
+
+  function updateNextReminderHintDashboard() {
+    const pending = reminders.filter(r => !r.completed);
+    const hintEl = document.getElementById('nextReminderMsg');
+    if (pending.length === 0) { hintEl.innerHTML = "✅ All tasks done! Great work."; return; }
+    const earliest = [...pending].sort((a,b)=> a.time.localeCompare(b.time))[0];
+    hintEl.innerHTML = `⏰ Next: <strong>${escapeHtml(earliest.text)}</strong> at ${earliest.time}`;
+  }
+
+  function rotateWellnessTip() {
+    const tips = [
+      "💙 Hydration = energy. Drink water regularly.",
+      "🩺 Age-based: Regular checkups prevent risks.",
+      "🚶 Even 15 min walk boosts mood & heart.",
+      "😴 Quality sleep = immune strength.",
+      "🥗 Leafy greens & local grains = vitality."
+    ];
+    const tipDiv = document.getElementById('dynamicWellnessTip');
+    if (tipDiv) tipDiv.innerText = tips[Math.floor(Math.random() * tips.length)];
+  }
+
+  function addReminderDirect(text, time, type) {
+    if (!text || text.trim() === "") return false;
+    const newRem = {
+      id: Date.now(),
+      text: text.trim(),
+      time: time || "09:00",
+      type: type || "Medication",
+      completed: false
+    };
+    reminders.push(newRem);
+    saveRemindersToLocal();
+    renderDashboardReminders();
+    return true;
+  }
+
+  // Dashboard add from UI
+  function setupDashboardEvents() {
+    const addBtn = document.getElementById('addReminderDashboardBtn');
+    const textInput = document.getElementById('newReminderText');
+    const timeInput = document.getElementById('newReminderTime');
+    const typeSelect = document.getElementById('newReminderType');
+    if (addBtn) {
+      addBtn.addEventListener('click', () => {
+        const txt = textInput.value.trim();
+        if (!txt) { alert("Please enter a reminder"); return; }
+        addReminderDirect(txt, timeInput.value, typeSelect.value);
+        textInput.value = "";
+      });
+    }
+    if (textInput) textInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') addBtn.click(); });
+  }
+
+  function updateDashboardGreeting() {
+    const greetSpan = document.getElementById('dashboardUserGreeting');
+    if (userProfile.name) greetSpan.innerHTML = `👋 ${escapeHtml(userProfile.name)}${userProfile.age ? `, ${userProfile.age}y` : ''}`;
+    else greetSpan.innerHTML = `👋 Dear friend`;
+  }
+  function updateDashboardDate() {
+    const dateSpan = document.getElementById('dashboardDate');
+    if(dateSpan) dateSpan.innerText = new Date().toLocaleDateString(undefined, { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+  }
+
+  // PAGE TRANSITIONS
+  function showPage(pageId) {
+    document.getElementById('onboardingPage').classList.add('hidden-page');
+    document.getElementById('confirmationPage').classList.add('hidden-page');
+    document.getElementById('dashboardPage').classList.add('hidden-page');
+    document.getElementById(pageId).classList.remove('hidden-page');
+  }
+
+  // Onboarding confirm -> store profile + reminder -> show confirmation page
+  function handleOnboardingConfirm() {
+    const name = document.getElementById('userNameInput').value.trim();
+    const ageRaw = document.getElementById('userAgeInput').value.trim();
+    const reminderType = document.getElementById('reminderTypeSelect').value;
+    let reminderDetail = document.getElementById('reminderDetailInput').value.trim();
+    // if custom and empty, fallback
+    if (reminderType === "Custom" && reminderDetail === "") reminderDetail = "Custom health reminder";
+    else if (reminderType !== "Custom" && reminderDetail === "") {
+      if (reminderType === "Medication") reminderDetail = "Take daily medication";
+      else if (reminderType === "Checkup") reminderDetail = "Schedule health checkup";
+      else if (reminderType === "Hydration") reminderDetail = "Drink enough water";
+      else if (reminderType === "Exercise") reminderDetail = "Do physical activity";
+    }
+    // Save user profile
+    userProfile.name = name || "Tigray User";
+    userProfile.age = ageRaw ? parseInt(ageRaw) : null;
+    saveProfileLocal();
+
+    // Clear previous reminders (fresh start based on selection)
+    reminders = [];
+    // add the selected reminder with default time 09:00
+    if (reminderDetail && reminderDetail !== "") {
+      const finalType = (reminderType === "Custom") ? "Medication" : reminderType;
+      addReminderDirect(reminderDetail, "09:00", finalType);
+    }
+    // Age based extra gentle reminder: if age>60 suggest blood pressure reminder
+    if (userProfile.age && userProfile.age >= 60) {
+      const hasBP = reminders.some(r => r.text.toLowerCase().includes("blood pressure") || r.text.toLowerCase().includes("bp"));
+      if (!hasBP) addReminderDirect("Check blood pressure", "08:30", "Checkup");
+    }
+    saveRemindersToLocal();
+
+    // Show confirmation page preview
+    const previewSpan = document.getElementById('reminderPreviewText');
+    if (previewSpan) previewSpan.innerText = `📌 "${escapeHtml(reminderDetail)}" at 09:00 (${reminderType === "Custom" ? "Reminder" : reminderType})`;
+    const confirmMsg = document.getElementById('confirmMessage');
+    if (confirmMsg) confirmMsg.innerHTML = `Hello ${escapeHtml(userProfile.name)}! Your reminder is safely stored.<br>You can now go to your dashboard.`;
+    showPage('confirmationPage');
+  }
+
+  // from confirmation -> dashboard
+  function goToDashboard() {
+    // load again to ensure sync
+    loadData();
+    renderDashboardReminders();
+    updateDashboardGreeting();
+    updateDashboardDate();
+    setupDashboardEvents();
+    showPage('dashboardPage');
+    // start interval for wellness & date
+    setInterval(() => { if(!document.getElementById('dashboardPage').classList.contains('hidden-page')) updateDashboardDate(); }, 60000);
+    setInterval(() => { if(!document.getElementById('dashboardPage').classList.contains('hidden-page')) rotateWellnessTip(); }, 35000);
+    rotateWellnessTip();
+  }
+
+  // suggestions click
+  function setupSuggestions() {
+    const suggSpans = document.querySelectorAll('#suggestionBox span');
+    suggSpans.forEach(span => {
+      span.addEventListener('click', () => {
+        const suggest = span.getAttribute('data-suggest');
+        if (suggest) {
+          document.getElementById('reminderDetailInput').value = suggest;
+          // auto change select to Custom to highlight custom detail
+          document.getElementById('reminderTypeSelect').value = "Custom";
+        }
+      });
+    });
+  }
+
+  // reset to onboarding if needed (first time or no data)
+  function initialCheck() {
+    loadData();
+    if (reminders.length === 0 && (!userProfile.name || userProfile.name === "")) {
+      // first time user, show onboarding
+      showPage('onboardingPage');
+    } else if (reminders.length >= 0) {
+      // already has reminders or profile -> directly go dashboard
+      renderDashboardReminders();
+      updateDashboardGreeting();
+      updateDashboardDate();
+      setupDashboardEvents();
+      showPage('dashboardPage');
+      setInterval(() => { if(!document.getElementById('dashboardPage').classList.contains('hidden-page')) updateDashboardDate(); }, 60000);
+      setInterval(() => rotateWellnessTip(), 40000);
+    } else {
+      showPage('onboardingPage');
+    }
+  }
+
+  function escapeHtml(str) { 
+    if(!str) return '';
+    return str.replace(/[&<>]/g, function(m){
+      if(m === '&') return '&amp;';
+      if(m === '<') return '&lt;';
+      if(m === '>') return '&gt;';
+      return m;
+    });
+  }
+
+  // Event binding
+  document.addEventListener('DOMContentLoaded', () => {
+    initialCheck();
+    document.getElementById('confirmSelectionBtn')?.addEventListener('click', handleOnboardingConfirm);
+    document.getElementById('goToDashboardBtn')?.addEventListener('click', goToDashboard);
+    setupSuggestions();
+  });
+</script>
+</body>
+</html>
